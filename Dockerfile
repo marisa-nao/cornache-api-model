@@ -9,5 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 8080
+
 # Command to start the server
 CMD [ "python", "main.py" ]
