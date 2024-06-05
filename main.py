@@ -8,10 +8,24 @@ from services.firestrore_manager import save_metadata_to_firestore
 from services.model_manager import predict_image_class
 import os
 import datetime
+from flask_swagger_ui import get_swaggerui_blueprint
 from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.json'
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Predict testing"
+    }
+)
+
+
 
 # Set the maximum allowed payload to 5 megabytes
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
@@ -64,10 +78,9 @@ def predict_image():
         }), 400
 
     try:
-        print(file)
         # Upload image to bucket and get public URL
         public_url = upload_to_bucket(file, 'predicted_image')
-        
+
         # Preprocess the image
         img_array = preprocess_image_as_array(file)
         created_at = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -108,5 +121,7 @@ def file_too_large(error):
         "message": "File size exceeds the maximum limit of 5 MB"
     }), 413
 
+app.register_blueprint(swaggerui_blueprint)
+
 if __name__ == '__main__':
-    app.run(host='localhost', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
