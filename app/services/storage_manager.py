@@ -34,4 +34,4 @@ def upload_to_bucket(file, fieldname):
     )
     blob.make_public()
 
-    return img_url_bucket(gcsname), gcsname
+    return img_url_bucket(gcsname)

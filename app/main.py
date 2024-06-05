@@ -28,6 +28,11 @@ bucket = storage_client.bucket(BUCKET_NAME)
 credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT)
 firestore_client = firestore.Client(credentials=credentials, project=PROJECT_ID)
 
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route("/predict", methods=["POST"])
 def predict_image():
     user_id = request.form.get('user_id')
@@ -51,8 +56,17 @@ def predict_image():
             "error": True,
             "message": "No file selected"
         }), 400
-    
+
+    if not allowed_file(file.filename):
+        return jsonify({
+            "error": True,
+            "message": "File type not allowed. Only JPG, JPEG, and PNG are allowed."
+        }), 400
+
     try:
+        print(file)
+        # Upload image to bucket and get public URL
+        public_url = upload_to_bucket(file, 'predicted_image')
         
         # Preprocess the image
         img_array = preprocess_image_as_array(file)
@@ -62,9 +76,8 @@ def predict_image():
         predicted_class, confidence_score = predict_image_class(best_model, img_array, class_names)
 
 
-        public_url, gcsname = upload_to_bucket(file, 'predicted_image')
+        # Save metadata to Firestore
         save_metadata_to_firestore(predicted_class, confidence_score, user_id, public_url, created_at)
-
 
         data_predict = {
         "error": False,
