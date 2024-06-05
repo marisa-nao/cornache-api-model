@@ -25,8 +25,6 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     }
 )
 
-
-
 # Set the maximum allowed payload to 5 megabytes
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
 
@@ -124,4 +122,4 @@ def file_too_large(error):
 app.register_blueprint(swaggerui_blueprint)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
