@@ -9,10 +9,12 @@ from services.model_manager import predict_image_class
 import os
 import datetime
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_cors import CORS
 from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app) 
 
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/swagger.json'
